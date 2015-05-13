@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html>
+    <head>
+        <title>Device Properties Example</title>
+        <meta id="viewport" content="width=device-width; initial-scale=1">
+        <link rel="stylesheet"  href="lib/jquery.mobile-1.4.5.min.css" />
+        <link rel="stylesheet"  href="css/index.css" />
+        <script type="text/javascript" src="lib/jquery-1.11.3.min.js"></script>
+        <script type="text/javascript" src="lib/jquery.mobile-1.4.5.min.js"></script>
+        <script type="text/javascript" src="lib/countUp.min.js"></script>
+        <script type="text/javascript" src="cordova.js"></script>
+        <script type="text/javascript" charset="utf-8">
+        
+        function onLoad() {
+            document.addEventListener("deviceready", onDeviceReady, false);
+        }
+        
+        var today = "";
+        var today_count = -1;
+        var diff = -1;
+        
+        var updated = "";
+        var previous = "";
+        var numAnim;
+        
+        function onDeviceReady(){
+            
+            getsite();
+            setInterval(function() {
+                        getsite();
+            }, 1000*60*15);
+        }
+        
+        function getsite(){
+            $.ajax({
+                   type: 'GET',
+                   dataType: 'html',
+                   url: 'http://www.onken.odawara.kanagawa.jp/files/dat_auto/list_N_day.html',
+                   success: function(data){
+                   
+                   var source = $('<div>' + data + '</div>');
+                   dataprovider(source);
+                   updatepage();
+                   },
+                   error: function(err){
+                   $('#test').text("HTML Read Error...");
+                   }
+            });
+
+        }
+        function dataprovider(source) {
+            
+            // updated, previous
+            $(source).find("CENTER").each(function(loop,item) {
+                                      var text = $(item).text().trim();
+                                      var re = /(\d+\/\d+\/\d+\s+\d+:\d+)/;
+                                      var latest = text.match(re);
+                                      var candidate = "最終更新時刻: " + latest[1];
+                                      if ( updated == "" ) {
+                                          updated = candidate;
+                                          previous = candidate;
+                                      }else if ( updated == candidate ) {
+                                          
+                                      }else{
+                                          previous = updated;
+                                          updated = candidate;
+                                      }
+                                      return false;
+                                      });
+            // today, today_count, diff
+            $(source).find("LI").each(function(loop,item) {
+                                      var text = $(item).text().trim();
+                                      var re = /(\d+\/\d+\/\d+)\s+(\d+)/;
+                                      var latest = text.match(re);
+                                      today  = latest[1];
+                                
+                                      if( today_count == -1 ){
+                                       today_count = Number(latest[2]);
+                                       diff = 0;
+                                      }else if (String(today_count) == latest[2] ){
+                                      } else {
+                                      diff = Number(latest[2]) - today_count;
+                                      today_count = Number(latest[2]);
+                                    
+                                      }
+                                      return false;
+                                      });
+                                      
+        }
+        
+        function updatepage(){
+            $('#test').text(today);
+            numAnim = new CountUp("counter", 0, 0);
+            numAnim.update(today_count);
+            numAnim.start();
+            
+            $('#updated').text(updated);
+            $('#prev').text(previous);
+            $('#diff').text(diff);
+            navigator.vibrate(diff);
+        }
+        
+        </script>
+    </head>
+    <body onload="onLoad()">
+        
+        <div data-role="page" id="page1">
+            <div data-theme="a" data-role="header">
+                <h3>箱根の地震を確認する</h3>
+            </div>
+            <div data-role="content">
+                <center>
+                    <div><h2 class="count" id="test"></h2></div><div>の箱根の地震は</div>
+                    <div><h1 class="count" id="counter">0</h1>回</div>
+                </center>
+                <BR>
+                <center>
+                    <div>
+                        <h3 class="count" >前回の</h3>
+                        <h3 class="count" id="prev" ></h3>
+                        <h3 class="count" >以後発生した地震</h3>
+                        <h1 class="count" id="diff">0</h1> 回</div>
+                    </center>
+              
+            </div>
+            <div data-theme="a" data-role="footer" data-position="fixed">
+                <h3 id="updated"></h3>
+            </div>
+        </div>
+
+    </body>
+</html>
