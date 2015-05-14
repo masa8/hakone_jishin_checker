@@ -29,7 +29,7 @@
             getsite();
             setInterval(function() {
                         getsite();
-            }, 1000*60*15);
+            }, 1000*60);
         }
         
         function getsite(){
@@ -44,7 +44,7 @@
                    updatepage();
                    },
                    error: function(err){
-                   $('#test').text("HTML Read Error...");
+                   $('#error_msg').text("HTML Read Error...");
                    }
             });
 
@@ -98,7 +98,11 @@
             $('#updated').text(updated);
             $('#prev').text(previous);
             $('#diff').text(diff);
-            navigator.vibrate(diff*1000);
+            
+            if (diff > 0 ){
+                navigator.notification.vibrate(diff*1000);
+                navigator.notification.beep(diff);
+            }
         }
         
         </script>
@@ -111,6 +115,7 @@
             </div>
             <div data-role="content">
                 <center>
+                     <div><h2 class="msg" id="error_msg"></h2></div>
                     <div><h2 class="count" id="test"></h2></div><div>の箱根の地震は</div>
                     <div><h1 class="count" id="counter">0</h1>回</div>
                 </center>
