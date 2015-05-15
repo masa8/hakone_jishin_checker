@@ -9,6 +9,7 @@
         <script type="text/javascript" src="lib/jquery-1.11.3.min.js"></script>
         <script type="text/javascript" src="lib/jquery.mobile-1.4.5.min.js"></script>
         <script type="text/javascript" src="lib/countUp.min.js"></script>
+        <script type="text/javascript" src="js/index.js"></script>
         <script type="text/javascript" src="cordova.js"></script>
         <script type="text/javascript" charset="utf-8">
         
@@ -25,15 +26,61 @@
         var previous_date = "";
         var numAnim;
         
+        var interval = 0;
+        var interval_id =null;
+        
         function onDeviceReady(){
-            
+            bind_event();
             getsite();
-            setInterval(function() {
-                        getsite();
-            }, 1000*60*15);
+            
+            interval = $('input[name=radio-choice]:checked').val();
+            interval_id = setInterval(getsite, Number(interval)*1000*60);
         }
         
+        function confirm_callback(){
+            clearInterval(interval_id);
+            interval = $('input[name=radio-choice]:checked').val();
+            interval_id = setInterval(getsite, Number(interval)*1000*60);
+        }
+        
+        function bind_event (){
+            
+            $("#page2").on("pagehide",function(event){
+                if ( interval_id != null ) {
+                           
+                           
+                           var result = $('input[name=radio-choice]:checked').val();
+                           var result_msg = "error";
+                           if (result == "1" ){
+                             result_msg = "1分"
+                           }else if ( result == "5"){
+                            result_msg = "5分"
+                           }else if ( result == "15"){
+                            result_msg = "15分"
+                           }else if ( result == "30"){
+                            result_msg = "30分"
+                           }else if ( result == "60"){
+                            result_msg = "1時間"
+                           }else if ( result == "720"){
+                            result_msg = "12時間"
+                           }else if ( result == "1440"){
+                            result_msg = "1日"
+                           }else{}
+                            navigator.notification.confirm("現在の箱根の地震の確認頻度は " + result_msg + " です。",confirm_callback, "設定",["OK"]);
+                }
+                          
+            });
+            
+           // $("[name=radio-choice]").change(function() {
+           //     if ( interval_id != null ) {
+             //    clearInterval(interval_id);
+               //  interval = $('input[name=radio-choice]:checked').val();
+                // interval_id = setInterval(getsite, Number(interval)*1000*60);
+                //}
+            //});
+        }
         function getsite(){
+            
             $.ajax({
                    type: 'GET',
                    dataType: 'html',
@@ -43,12 +90,14 @@
                    var source = $('<div>' + data + '</div>');
                    $('#error_msg').text("");
                    dataprovider(source);
-                    updatepage();
+                   updatepage();
                    },
-                    error: function(err){
-                    $('#error_msg').text("HTML Read Error...");
+                   error: function(err){
+                   $('#error_msg').text("HTML Read Error...");
                    }
             });
+                   
+                   
 
         }
         function dataprovider(source) {
@@ -104,15 +153,14 @@
         }
         
         function updatepage(){
-            $('#test').text(today_date);
+            $('#today').text(today_date);
             numAnim = new CountUp("counter", 0, 0);
             numAnim.update(today_count);
             numAnim.start();
             
             $('#updated').text(updated_date);
-            $('#prev').text(previous_date);
+            $('#prev').text(previous_date.replace("最終更新時刻: ",""));
             $('#diff').text(diff);
-            
             if (diff > 0 ){
                 navigator.notification.vibrate(diff*1000);
                 navigator.notification.beep(diff);
@@ -125,27 +173,67 @@
     <body onload="onLoad()">
         
         <div data-role="page" id="page1">
-            <div data-theme="a" data-role="header">
-                <h3>箱根の地震を通知音で感じる</h3>
+            <div  data-role="header" data-theme="a" >
+                    <h1>箱根の地震を通知音で知らせる係</h1>
+                     <a href="#page2" data-role="button" data-icon="gear" class="ui-btn-left" data-transition="flip" >設定</a>
             </div>
             <div data-role="content">
                 <center>
-                     <div><h2 class="msg" id="error_msg"></h2></div>
-                    <div><h2 class="count" id="test"></h2></div><div>の箱根の地震は</div>
-                    <div><h1 class="count" id="counter">0</h1>回</div>
+                     <div>
+                         <h2 class="msg" id="error_msg"></h2>
+                     </div>
+                    <div>
+                        <h3 class="count" id="today"></h3>
+                        <h3 class="count">に発生した箱根の地震は </h3>
+                        <h1 class="count_big" id="counter"></h1>
+                        <h3 class="count" >回</h3>
+                    </div>
                 </center>
                 <BR>
                 <center>
                     <div>
-                        <h3 class="count" >前回の</h3>
+                        <h3 class="count" >前回の確認時刻(</h3>
                         <h3 class="count" id="prev" ></h3>
-                        <h3 class="count" >以後発生した地震</h3>
-                        <h1 class="count" id="diff"></h1> 回</div>
+                        <h3 class="count" >)後</h3>
+                        <h3 class="count" >の地震は</h3>
+                        <h1 class="count_big" id="diff"></h1>
+                        <h3 class="count" >回</h3>
+                    </div>
                     </center>
               
             </div>
             <div data-theme="a" data-role="footer" data-position="fixed">
                 <h3 id="updated"></h3>
+            </div>
+        </div>
+        
+        <div data-role="page" id="page2">
+            <div data-theme="a" data-role="header" data-add-back-btn="true">
+                <h3>設定</h3>
+            </div>
+            <div data-role="content">
+                <form>
+                    <fieldset data-role="controlgroup" id="check_interval">
+                    <legend>地震を確認する頻度:</legend>
+                    <input type="radio" name="radio-choice" id="radio-choice-1min" value="1" >
+                    <label for="radio-choice-1min">1分に一度確認する</label>
+                    <input type="radio" name="radio-choice" id="radio-choice-5mins" value="5">
+                    <label for="radio-choice-5mins">5分に一度確認する</label>
+                    <input type="radio" name="radio-choice" id="radio-choice-15mins" value="15">
+                    <label for="radio-choice-15mins">15分に一度確認する</label>
+                    <input type="radio" name="radio-choice" id="radio-choice-30mins" value="30">
+                    <label for="radio-choice-30mins">30分に一度確認する</label>
+                    <input type="radio" name="radio-choice" id="radio-choice-1hour" value="60" checked="checked">
+                    <label for="radio-choice-1hour">1時間に一度確認する</label>
+                    <input type="radio" name="radio-choice" id="radio-choice-12hours" value="720">
+                    <label for="radio-choice-12hours">12時間に一度確認する</label>
+                    <input type="radio" name="radio-choice" id="radio-choice-1day" value="1440">
+                    <label for="radio-choice-1day">1日に一度確認する</label>
+                    </fieldset>
+                </form>
+                <h2 class="notification_msg">設定時の注意：箱根の地震の確認のために神奈川県温泉地学研究所のWebサイトを見に行っています。不必要に短い頻度で確認する設定は避けて、ご自身にとって適切な確認頻度を設定して下さい。</h2>
+            </div>
+            <div data-theme="a" data-role="footer" data-position="fixed">
             </div>
         </div>
 
