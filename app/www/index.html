@@ -16,12 +16,13 @@
             document.addEventListener("deviceready", onDeviceReady, false);
         }
         
-        var today = "";
+        var today_date = "";
         var today_count = -1;
+        var just_updated = true;
         var diff = -1;
         
-        var updated = "";
-        var previous = "";
+        var updated_date = "";
+        var previous_date = "";
         var numAnim;
         
         function onDeviceReady(){
@@ -40,49 +41,62 @@
                    success: function(data){
                    
                    var source = $('<div>' + data + '</div>');
+                   $('#error_msg').text("");
                    dataprovider(source);
-                   updatepage();
+                    updatepage();
                    },
-                   error: function(err){
-                   $('#error_msg').text("HTML Read Error...");
+                    error: function(err){
+                    $('#error_msg').text("HTML Read Error...");
                    }
             });
 
         }
         function dataprovider(source) {
             
-            // updated, previous
+            // updated_date, previous_date
             $(source).find("CENTER").each(function(loop,item) {
                                       var text = $(item).text().trim();
                                       var re = /(\d+\/\d+\/\d+\s+\d+:\d+)/;
                                       var latest = text.match(re);
                                       var candidate = "最終更新時刻: " + latest[1];
-                                      if ( updated == "" ) {
-                                          updated = candidate;
-                                          previous = candidate;
-                                      }else if ( updated == candidate ) {
+                                      
+                                      //INIT
+                                      if ( updated_date == "" ) {
+                                          updated_date = candidate;
+                                          previous_date = candidate;
+                                      
+                                      // NOT UPDATED
+                                      }else if ( updated_date == candidate ) {
+                                          previous_date = updated_date;
                                           
+                                      // UPDATED
                                       }else{
-                                          previous = updated;
-                                          updated = candidate;
+                                          previous_date = updated_date;
+                                          updated_date = candidate;
                                       }
                                       return false;
                                       });
-            // today, today_count, diff
+                                      
+                                      
+            // today_date, today_count, diff
             $(source).find("LI").each(function(loop,item) {
                                       var text = $(item).text().trim();
                                       var re = /(\d+\/\d+\/\d+)\s+(\d+)/;
                                       var latest = text.match(re);
-                                      today  = latest[1];
+                                      today_date  = latest[1];
                                 
+                                      // INIT
                                       if( today_count == -1 ){
                                        today_count = Number(latest[2]);
                                        diff = 0;
+                                    
+                                      // NO QUAKE
                                       }else if (String(today_count) == latest[2] ){
+                                       diff = 0;
+                                      // QUAKE HAPPEND
                                       } else {
                                       diff = Number(latest[2]) - today_count;
                                       today_count = Number(latest[2]);
-                                    
                                       }
                                       return false;
                                       });
@@ -90,19 +104,20 @@
         }
         
         function updatepage(){
-            $('#test').text(today);
+            $('#test').text(today_date);
             numAnim = new CountUp("counter", 0, 0);
             numAnim.update(today_count);
             numAnim.start();
             
-            $('#updated').text(updated);
-            $('#prev').text(previous);
+            $('#updated').text(updated_date);
+            $('#prev').text(previous_date);
             $('#diff').text(diff);
             
             if (diff > 0 ){
                 navigator.notification.vibrate(diff*1000);
                 navigator.notification.beep(diff);
             }
+
         }
         
         </script>
@@ -111,7 +126,7 @@
         
         <div data-role="page" id="page1">
             <div data-theme="a" data-role="header">
-                <h3>箱根の地震を感じる</h3>
+                <h3>箱根の地震を通知音で感じる</h3>
             </div>
             <div data-role="content">
                 <center>
@@ -125,7 +140,7 @@
                         <h3 class="count" >前回の</h3>
                         <h3 class="count" id="prev" ></h3>
                         <h3 class="count" >以後発生した地震</h3>
-                        <h1 class="count" id="diff">0</h1> 回</div>
+                        <h1 class="count" id="diff"></h1> 回</div>
                     </center>
               
             </div>
