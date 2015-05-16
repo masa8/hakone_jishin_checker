@@ -18,3 +18,14 @@ android版のみ
 
 ### License
 MIT
+
+
+### 依存ライブラリ
+cordova 3.6.3
+jquery-1.11.3.min.js
+jquery.mobile-1.4.5.min.js
+countUp.min.js
+
+### 依存プラグイン
+org.apache.cordova.dialogs 0.3.0 "Notification"
+org.apache.cordova.vibration 0.3.13 "Vibration"
