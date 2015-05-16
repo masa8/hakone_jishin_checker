@@ -86,14 +86,13 @@
                    dataType: 'html',
                    url: 'http://www.onken.odawara.kanagawa.jp/files/dat_auto/list_N_day.html',
                    success: function(data){
-                   
-                   var source = $('<div>' + data + '</div>');
-                   $('#error_msg').text("");
-                   dataprovider(source);
-                   updatepage();
+　                   var source = $('<div>' + data + '</div>');
+  　                 $('#error_msg').text("");
+    　               dataprovider(source);
+      　             updatepage();
                    },
                    error: function(err){
-                   $('#error_msg').text("HTML Read Error...");
+        　           $('#error_msg').text("HTML Read Error...");
                    }
             });
                    
