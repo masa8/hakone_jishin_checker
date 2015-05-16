@@ -1,3 +1,4 @@
+![HakoneQuakeChecker](android_res/drawable/icon.png)
 ### Hakone Quake Checker
 箱根の地震を通知音で知らせる係
 
