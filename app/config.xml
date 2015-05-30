@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="masashimo.hakone.jishin.checker" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>HakoneQuakeChecker</name>
+    <description>
+        HakoneQuakeChecker
+    </description>
+    <author email="dev@cordova.apache.org" href="http://cordova.io">
+        Masa8
+    </author>
+    <content src="index.html" />
+    <access origin="*" />
+
+    <platform name="android">
+        <feature name="KeepRunning" value="true" />
+    </platform>
+</widget>
