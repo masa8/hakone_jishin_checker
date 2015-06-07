@@ -71,14 +71,8 @@
                           
             });
             
-           // $("[name=radio-choice]").change(function() {
-           //     if ( interval_id != null ) {
-             //    clearInterval(interval_id);
-               //  interval = $('input[name=radio-choice]:checked').val();
-                // interval_id = setInterval(getsite, Number(interval)*1000*60);
-                //}
-            //});
         }
+        
         function getsite(){
             
             $.ajax({
@@ -161,7 +155,7 @@
             $('#prev').text(previous_date.replace("最終更新時刻: ",""));
             $('#diff').text(diff);
             if (diff > 0 ){
-                navigator.notification.vibrate(diff*1000);
+                // navigator.notification.vibrate(diff*1000);
                 navigator.notification.beep(diff);
             }
 
