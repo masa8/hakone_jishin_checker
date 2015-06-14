@@ -1,5 +1,5 @@
 ![HakoneQuakeChecker](android_res/drawable/icon.png)
-### Hakone Quake Checker
+### Quake Checker
 地震を通知音で知らせる係
 
 ### 特徴
